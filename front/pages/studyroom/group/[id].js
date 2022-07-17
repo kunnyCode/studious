@@ -739,13 +739,13 @@ export default function Group() {
                       height="100%"
                     ></video>
                   </div>
-                  {/* <AIFunc
+                  <AIFunc
                     cb={(result) => {
                       AlertNoHear(result);
                     }}
                     camera={videoRef}
                     isGroup={true}
-                  /> */}
+                  />
                 </div>
                 <AlertModal />
 
