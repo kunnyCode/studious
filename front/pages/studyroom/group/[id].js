@@ -4,11 +4,11 @@ import AlertModal from '../../../components/studyroom/AlertModal';
 import Loading from '../../../components/common/Loading';
 import { io, Socket } from 'socket.io-client';
 import { aiAtom, noUseAiAtom } from '../../../core/atoms/aiState';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, createElement } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import * as API from '../../api/api';
 import { useRouter } from 'next/router';
-
+import * as ReactDOM from 'react-dom/client';
 import Other from '../other';
 import { userAtom } from '../../../core/atoms/userState';
 import ChatHeader from '../../../components/studyroom/chat/ChatHeader';
@@ -100,6 +100,8 @@ export default function Group() {
   /** @type {List[Object]} */
   const [userDatas, setUserDatas] = useState([]);
 
+  const [others, setOthers] = useState([]);
+
   const chattingBoxRef = useRef();
   const stopWatchRef = useRef();
   const socketId = useRef();
@@ -159,6 +161,42 @@ export default function Group() {
           time: res.data.time,
         };
       }
+
+      // console.log("userInfo : ", otherCameras.current[res.id]);
+
+      // const other = document.getElementById("cameras");
+      // console.log("others : ", other);
+
+      // const camera = React.createElement("Other", {
+      //   time: otherCameras.current[res.id].time,
+      //   userId: res.id,
+      //   stream: otherCameras.current[res.id].stream,
+      //   ref: otherCameras.current[res.id],
+      //   name: otherCameras.current[res.id].name
+      // })
+
+      setOthers(others => [...others, <Other
+        key={res.id}
+        time={otherCameras.current[res.id].time}
+        userId={res.id}
+        stream={otherCameras.current[res.id].stream}
+        ref={otherCameras.current[res.id]}
+        name={otherCameras.current[res.id].name}
+      />]);
+      
+      // other.appendChild()
+
+      // React.Children
+
+      // other.appendChild(camera);
+
+      // const root = ReactDOM.createRoot(other);
+      // root.render();
+
+      // console.log("camera : ", camera);
+
+      // React.render(, other, res.id);
+
     } else if (res.type == 'state') {
       // 데이터 안에 넣기
       console.log('others id : ', res.id);
@@ -337,6 +375,7 @@ export default function Group() {
    */
    async function makeConnection(userId, offer = null) {
     if (RTCPeerConnection != undefined) {
+      
       myPeerConnection = new RTCPeerConnection({
         iceServers: [
           {
@@ -348,11 +387,13 @@ export default function Group() {
           },
         ],
       });
+    
       // ice 후보를 수집합니다.
       myPeerConnection.addEventListener('icecandidate', (data) => {
         // ice 이벤트 발생 시 이를 방안의 다른 사람들에게 내껄 전달
         if (data.candidate) {
-          console.log(`send my ice : `, data);
+          console.log(`send my ice : `, data.candidate);
+          console.log(data?.target.getSenders());
           socket.emit('ice', data.candidate, userId, socket.id); // send ice candidate
         }
       });
@@ -361,6 +402,10 @@ export default function Group() {
           myPeerConnection.restartIce();
         }
       });
+
+      myPeerConnection.addEventListener('close', () => {
+        console.log("close");
+      })
       
       myPeerConnection.addEventListener('track', (data) => {
         console.log(data);
@@ -384,12 +429,12 @@ export default function Group() {
       });
 
       // 나한테 webcam이 있으면 피어컨넥션에 추가한다.
-      if (myStream != null) {
+      if (myStream) {
         myStream
-          .getTracks()
-          .forEach((track) => myPeerConnection.addTrack(track, myStream));
+        ?.getTracks()
+        ?.forEach((track) => myPeerConnection.addTrack(track, myStream));
       }
-
+      
       console.log("add MyStream : ", myStream);
       console.log("add MyStream : ", myPeerConnection.getSenders());
 
@@ -460,6 +505,7 @@ export default function Group() {
           console.log('add DataChannels');
           console.log(dataChannels);
         });
+
         myPeerConnection.setRemoteDescription(_offer);
         // 상대방 목적지로 전달받은 offer를 설정
         answer = await myPeerConnection.createAnswer();
@@ -511,6 +557,9 @@ export default function Group() {
   useEffect(() => {
     {
       roomData();
+      console.log(myPeerConnection);
+      console.log(myStream);
+      console.log(myDataChannel);
     }
     if (isLoading) {
       if (myStream !== null) {
@@ -530,13 +579,9 @@ export default function Group() {
 
     socket.on('welcome', async (userId, userName, newUserId) => {
       console.log('enter user : ', userName);
-      console.log('other userId : ', userId);
-      console.log('other userSocketId : ', newUserId);
       const offer = await makeConnection(newUserId);
-      console.log('--------------------------------------');
       console.log('make - peerconnections', peerConnections);
-      console.log(`${userName} send offer`, userId);
-
+      console.log(`send offer`);
       socket.emit('offer', offer, newUserId, socket.id);
     });
 
@@ -571,11 +616,32 @@ export default function Group() {
           console.log('delete otherCamera', otherCameras.current);
         }
       });
+
+      
       console.log("delete result");
       console.log(otherCameras);
       console.log(dataChannels);
       console.log(peerConnections);
       console.log("bye event myPeerConnection : ", myPeerConnection);
+
+
+      console.log("leaveID", leaveId);
+      console.log("others : ", others);
+
+      const temp = Object.keys(otherCameras.current).map((user, i) => {
+        console.log(otherCameras.current[user].stream);
+        return <Other
+              key={user}
+              time={otherCameras.current[user].time}
+              userId={user}
+              stream={otherCameras.current[user].stream}
+              ref={otherCameras.current[user]}
+              name={otherCameras.current[user].name}
+            />
+      })
+
+      setOthers(temp)
+
     });
 
     socket.on('offer', async (offer, offersId) => {
@@ -593,7 +659,9 @@ export default function Group() {
       /**
        * @description 방에 있던 사람들은 뉴비를 위해 생성한 커섹션에 answer를 추가한다.
        */
-      await peerConnections[newUserId].setRemoteDescription(answer);
+      console.log("receive Answer");
+      console.log(peerConnections[newUserId].getSenders());
+      peerConnections[newUserId].setRemoteDescription(answer);
     });
 
 
@@ -601,11 +669,9 @@ export default function Group() {
       /**
        * @description 다른 사람에게 온 othersId를 myPeerConnection에 등록
        */
-      console.log("ice", ice);
+      console.log("receive ice", ice.candidate);
       peerConnections[othersId].addIceCandidate(ice);
-      console.log('add IceCandidate');
-      console.log('ice owner : ', othersId);
-      console.log(peerConnections);
+
       Object.keys(peerConnections).map((id) => {
         console.log("peer sender", peerConnections[id].getSenders());
       })
@@ -620,8 +686,9 @@ export default function Group() {
         roomId,
         attend: false,
       });
-
+      
       socket.off();
+      socket.close();
       location.reload();
       rtcInit();
     };
@@ -651,7 +718,7 @@ export default function Group() {
           </p>
           <div className="grid justify-center lg:justify-between lg:flex lg:mx-[2rem] lg:max-w-[1600px]  ">
             <div className="flex lg:w-9/12">
-              <div className="h-full w-full flex flex-raw flex-wrap lg:flex justify-center gap-x-[1rem] gap-y-[2.5rem]">
+              <div id="cameras" className="h-full w-full flex flex-raw flex-wrap lg:flex justify-center gap-x-[1rem] gap-y-[2.5rem]">
                 <div className="bg-yellow-50/30 w-[500px] h-[370px] relative rounded-xl border-amber-100 border-2 shadow-2xl shadow-amber-400/10 ">
                   <StopWatch
                     myTimer={true}
@@ -672,18 +739,18 @@ export default function Group() {
                       height="100%"
                     ></video>
                   </div>
-                  <AIFunc
+                  {/* <AIFunc
                     cb={(result) => {
                       AlertNoHear(result);
                     }}
                     camera={videoRef}
                     isGroup={true}
-                  />
+                  /> */}
                 </div>
                 <AlertModal />
 
                 {/* 다른 사람들 웹캠 */}
-                {peerConnections && Object.keys(otherCameras.current).map((user, i) => {
+                {/* {peerConnections && Object.keys(otherCameras.current).map((user, i) => {
                   console.log('userId : ', user);
                   console.log(
                     'usercamera : ',
@@ -701,6 +768,12 @@ export default function Group() {
                         name={otherCameras.current[user].name}
                       ></Other>
                     </>
+                  );
+                })} */}
+                {others.map((v, i) => {
+                  console.log(i, ":", v);
+                  return (
+                    <>{v}</>
                   );
                 })}
               </div>
