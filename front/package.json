@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build && next export",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "deploy": "aws s3 sync ./out s3://studioselice --profile=Studios",
+    "deploy2": "aws s3 sync ./build s3://studioselice --profile=Studios",
+    "invalidate": "aws cloudfront create-invalidation --profile=Studios --distribution-id E3M1515EB23PUJ --paths /*"
   },
   "dependencies": {
     "@tensorflow-models/coco-ssd": "^2.2.2",

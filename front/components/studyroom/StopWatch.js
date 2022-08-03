@@ -184,11 +184,14 @@ const StopWatch = forwardRef(
                       </h5>
                       <p className="mb-3 font-normal text-gray-700">
                         5초 뒤에 타이머가 시작됩니다.
-                        <br /> 웹 캠에 눈, 코 입이 잘 보이도록 설정해주세요.
+                        <br /> 웹 캠에{' '}
+                        <span className="bg-amber-200">얼굴</span>과
+                        <span className="bg-amber-200">상반신</span>이 잘
+                        보이도록 설정해주세요.
                       </p>
                       <svg
                         role="status"
-                        className="inline w-8 h-8 mr-2 text-gray-200 animate-spin fill-blue-600"
+                        className="inline w-8 h-8 mr-2 text-white animate-spin fill-amber-400"
                         viewBox="0 0 100 101"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -204,7 +207,7 @@ const StopWatch = forwardRef(
                       </svg>
                     </div>
                     <button
-                      className="py-2.5 px-2.5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200"
+                      className="py-2.5 px-2.5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:shadow-lg hover:bg-amber-400 hover:text-white hover:shadow-amber-300/50 focus:z-10 focus:ring-4 focus:ring-gray-200"
                       onClick={handleClick}
                     >
                       나가기
