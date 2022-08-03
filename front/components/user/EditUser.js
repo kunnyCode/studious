@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { editUserModalAtom } from '../../core/atoms/modalState';
 import { isLoginAtom, userAtom } from '../../core/atoms/userState';
@@ -8,7 +8,9 @@ import Button from '../common/Button';
 
 const EditUser = () => {
   const setShowModal = useSetRecoilState(editUserModalAtom);
-  const [user, setUser] = useRecoilState(userAtom);
+  const [recoilUser, setRecoilUser] = useRecoilState(userAtom);
+  const [user, setUser] = useState(recoilUser);
+
   const setIsLogin = useSetRecoilState(isLoginAtom);
   const router = useRouter();
 
@@ -20,6 +22,7 @@ const EditUser = () => {
     });
     const updatedUser = await res.data;
 
+    setRecoilUser(updatedUser);
     setUser(updatedUser);
     setShowModal(false);
     alert('회원 정보가 수정되었습니다.');
