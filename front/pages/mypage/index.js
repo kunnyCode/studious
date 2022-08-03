@@ -66,10 +66,12 @@ export default function mypage() {
         datas.length == 0
           ? null
           : datas.map((data) =>
-              gittime.push([
-                data.date,
-                Math.floor(toMilliseconds(data.studyTimeADay) / 7200),
-              ])
+              data.studyTimeADay === ' '
+                ? null
+                : gittime.push([
+                    data.date,
+                    Math.floor(toMilliseconds(data.studyTimeADay) / 7200),
+                  ])
             );
       } catch (err) {
         setTimeData(['00:00:00', '00:00:00', '00:00:00']);
