@@ -94,7 +94,6 @@ const StopWatch = forwardRef(
       useEffect(() => {
         if (getReady && userIsHear) {
           handleRestart();
-          setStartTime(dayjs().format('YYYY-MM-DD HH:mm:ss'));
         } else if (getReady && !userIsHear) {
           handlePause();
           setEndTime(dayjs().format('YYYY-MM-DD HH:mm:ss'));
