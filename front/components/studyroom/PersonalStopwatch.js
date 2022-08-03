@@ -159,7 +159,9 @@ const PersonalStopwatch = ({ roomId, membersOnly }) => {
                 </h5>
                 <p className="mb-3 font-normal text-gray-700">
                   5초 뒤에 타이머가 시작됩니다.
-                  <br /> 웹 캠에 눈, 코 입이 잘 보이도록 설정해주세요.
+                  <br /> 웹 캠에 <span className="bg-amber-200">얼굴</span>과
+                  <span className="bg-amber-200">상반신</span>이 잘 보이도록
+                  설정해주세요.
                 </p>
                 <svg
                   role="status"

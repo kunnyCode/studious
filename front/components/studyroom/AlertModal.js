@@ -37,7 +37,9 @@ const AlertModal = () => {
                 <p className="mb-5 text-sm font-normal text-gray-500 ">
                   AI가 유저를 확인하지 못해 타이머가 멈췄습니다.
                   <br />
-                  눈, 코, 입이 모두 화면에 나오게 카메라를 조정해주세요!
+                  <span className="bg-amber-200">얼굴</span>과
+                  <span className="bg-amber-200">상반신</span>이 화면에 나오게
+                  카메라를 조정해주세요!
                 </p>
                 <button
                   type="button"
