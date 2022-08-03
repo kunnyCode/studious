@@ -23,8 +23,6 @@ export default function NavBar() {
   const [isLogin, setIsLogin] = useRecoilState(isLoginAtom);
   const [element, setElement] = useState(null);
 
-  const resetUser = useResetRecoilState(tokenAtom);
-
   const handleShow = () => {
     setShowOptions(true);
   };
@@ -48,6 +46,7 @@ export default function NavBar() {
     }
   }
   useEffect(() => {
+    //userToken이 없으면 로그아웃
     if (typeof window !== 'undefined') {
       const item = sessionStorage.getItem('userToken');
       if (!item) {
@@ -64,6 +63,8 @@ export default function NavBar() {
   };
 
   function NavItem(item, index) {
+    //네브바에서 각 메뉴를 생성
+    //현재 보고있는 메뉴는 강조효과
     function make_link() {
       if (token && router.pathname === item[1]) {
         return (
@@ -94,6 +95,7 @@ export default function NavBar() {
     );
   }
   function NavDropItem(item, index) {
+    //화면이 작아졌을 때 나오는 네브 아이템
     return (
       <>
         {index === undefined ? (

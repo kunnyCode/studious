@@ -1,32 +1,29 @@
+import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import BoldText from '../../components/common/BoldText';
 import TimeBox from '../../components/common/TimeBox';
 import dynamic from 'next/dynamic';
 import Pie from '../../components/common/Pie';
 import Button from '../../components/common/Button';
-import { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
 import { userAtom } from '../../core/atoms/userState';
 import { useRouter } from 'next/router';
-
 import * as API from '../api/api';
 import { charts_data, heatmap_tip } from '../../components/common/UseData';
 export default function mypage() {
   const useratom = useRecoilValue(userAtom);
-
   const [timeDatas, setTimeData] = useState(null);
   const [user, setUser] = useState();
   const [gittime, setGitTime] = useState([]);
   const [timeGoal, setTimeGoal] = useState();
   const [getTimeGoal, setGetTimeGoal] = useState();
   const [pieData, setPieData] = useState([]);
-
   const router = useRouter();
-
   const NoSSR = dynamic(() => import('../../components/common/Heatmap'), {
     ssr: false,
   });
 
   function toMilliseconds(studyTimeADay) {
+    //서버에서 받은 시간을 초로 변환
     const studyTimeADayNum =
       Number(studyTimeADay.slice(0, 2)) * 60 * 60 * 1000 +
       Number(studyTimeADay.slice(3, 5)) * 60 * 1000 +
@@ -38,6 +35,7 @@ export default function mypage() {
   useEffect(() => {
     const getTimeData = async () => {
       try {
+        //유저 정보 가져오기
         try {
           const res = await API.get('user', router.query.id);
           console.log(res, '유저정보');
@@ -45,7 +43,7 @@ export default function mypage() {
         } catch (error) {
           console.log(error);
         }
-
+        //Git그래프에 들어가는 시간 가져오기
         const totaltime = await API.get('totaltime', router.query.id);
         const data = totaltime.data;
         var data2 = [
@@ -54,7 +52,7 @@ export default function mypage() {
           data.totalStudyTime,
         ];
         setTimeData(data2);
-
+        //사용자의 dailysheets 가져오기
         const dailysheets = await API.get('dailysheets', router.query.id);
         const datas = dailysheets.data;
         setGetTimeGoal(datas[datas.length - 1].timeGoal);
@@ -90,7 +88,7 @@ export default function mypage() {
       setGitTime(gittime);
     }
   }, [router.isReady]);
-
+  //목표 공부 시간 설정
   async function clickHandler(e) {
     var res = '';
     {
@@ -110,6 +108,7 @@ export default function mypage() {
     }
     setGetTimeGoal(res.data.timeGoal);
   }
+
   return (
     <div className="container">
       {user && (
