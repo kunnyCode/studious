@@ -9,18 +9,16 @@ import Link from 'next/link';
  * @description 나의 누적 공부시간과 프로필
  */
 const HomeMyLogTime = () => {
-  const useratom = useRecoilValue(userAtom);
+  const user = useRecoilValue(userAtom);
   const [timeDatas, setTimeData] = useState(null);
-  const [user, setUser] = useState();
 
   /**
    * @description 유저의 전체 누적 공부시간을 불러옴
    */
   useEffect(() => {
-    setUser(useratom);
     const getTotalTime = async () => {
       try {
-        const res = await API.get('totaltime', useratom.id);
+        const res = await API.get('totaltime', user.id);
         const data = res.data;
         setTimeData(data.totalStudyTime);
       } catch (err) {
@@ -28,7 +26,7 @@ const HomeMyLogTime = () => {
       }
     };
     getTotalTime();
-  }, [user]);
+  }, []);
 
   return (
     <div className="container px-6 py-16 mx-auto">
